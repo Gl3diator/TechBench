@@ -1,0 +1,41 @@
+# TechBench build outputs
+*.iso
+*.img
+*.raw
+*.qcow2
+
+# Debian live-build generated data
+.auto/
+.cache/
+binary/
+chroot/
+chroot.tmp/
+
+# Temporary build directories
+project/work/
+project/out/
+
+# Package/build files
+*.deb
+*.udeb
+*.build
+*.buildinfo
+*.changes
+
+# Logs
+*.log
+
+# Checksums
+*.sha256
+*.sha512
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db
