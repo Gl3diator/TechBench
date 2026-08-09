@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+WALLPAPER="/usr/share/techbench/branding/techbench-dark-wallpaper.jpg"
+MARKER="${XDG_CONFIG_HOME:-${HOME}/.config}/techbench/wallpaper-initialized"
+
+[[ -r "${WALLPAPER}" ]] || exit 0
+
+# Do not override a user's wallpaper again after initial setup.
+[[ -e "${MARKER}" ]] && exit 0
+
+# Give the graphical session a moment to finish starting.
+for _ in $(seq 1 40); do
+    if xrandr --query >/dev/null 2>&1 &&
+       xfconf-query -c xfce4-desktop -lv >/dev/null 2>&1; then
+        break
+    fi
+
+    sleep 0.25
+done
+
+mapfile -t MONITORS < <(
+    xrandr --query 2>/dev/null |
+        awk '/ connected/{print $1}'
+)
+
+[[ "${#MONITORS[@]}" -gt 0 ]] || exit 0
+
+set_property() {
+    local property="$1"
+    local type="$2"
+    local value="$3"
+
+    if xfconf-query \
+        -c xfce4-desktop \
+        -p "${property}" \
+        >/dev/null 2>&1; then
+
+        xfconf-query \
+            -c xfce4-desktop \
+            -p "${property}" \
+            -s "${value}"
+    else
+        xfconf-query \
+            -c xfce4-desktop \
+            -p "${property}" \
+            -n \
+            -t "${type}" \
+            -s "${value}"
+    fi
+}
+
+for monitor in "${MONITORS[@]}"; do
+    for workspace in 0 1 2 3; do
+        base="/backdrop/screen0/monitor${monitor}/workspace${workspace}"
+
+        set_property \
+            "${base}/last-image" \
+            string \
+            "${WALLPAPER}"
+
+        set_property \
+            "${base}/image-style" \
+            int \
+            "1"
+    done
+done
+
+mkdir -p "$(dirname "${MARKER}")"
+touch "${MARKER}"

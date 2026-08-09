@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=TechBench Wallpaper Initializer
+Comment=Apply the TechBench wallpaper to detected displays
+Exec=/usr/local/bin/techbench-wallpaper-init
+OnlyShowIn=XFCE;
+Terminal=false
+NoDisplay=true

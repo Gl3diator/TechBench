@@ -60,6 +60,8 @@ THEME_SOURCE_DIR="${WORKSPACE}/theme-sources"
 mkdir -p \
     "${WORKSPACE}/config/package-lists" \
     "${INCLUDES}/etc/skel/.config/xfce4" \
+    "${INCLUDES}/etc/xdg/autostart" \
+    "${INCLUDES}/usr/local/bin" \
     "${INCLUDES}/usr/share/techbench/branding" \
     "${INCLUDES}/usr/share/themes" \
     "${INCLUDES}/usr/share/icons" \
@@ -77,6 +79,16 @@ echo "==> Adding TechBench XFCE defaults"
 cp -a \
     "${PROJECT_ROOT}/project/config/core/xfce/xfconf" \
     "${INCLUDES}/etc/skel/.config/xfce4/"
+
+echo "==> Adding TechBench wallpaper initializer"
+
+install -m 0755 \
+    "${PROJECT_ROOT}/project/config/core/xfce/scripts/techbench-wallpaper-init" \
+    "${INCLUDES}/usr/local/bin/techbench-wallpaper-init"
+
+install -m 0644 \
+    "${PROJECT_ROOT}/project/config/core/xfce/autostart/techbench-wallpaper.desktop" \
+    "${INCLUDES}/etc/xdg/autostart/techbench-wallpaper.desktop"
 
 echo "==> Adding TechBench branding"
 
