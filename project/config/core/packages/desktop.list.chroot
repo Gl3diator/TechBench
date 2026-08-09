@@ -6,6 +6,9 @@ sudo
 live-tools
 eject
 
+# HTTPS / certificates
+ca-certificates
+
 # X / desktop
 xorg
 xfce4
@@ -13,6 +16,7 @@ xfce4-terminal
 xfce4-power-manager
 xfce4-notifyd
 xfce4-whiskermenu-plugin
+xfce4-pulseaudio-plugin
 
 # Display manager
 lightdm
@@ -33,3 +37,7 @@ network-manager-gnome
 # Audio
 pipewire-audio
 pavucontrol
+
+# TechBench GTK theme runtime support
+gnome-themes-extra
+gtk2-engines-murrine
