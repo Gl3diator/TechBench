@@ -1,0 +1,35 @@
+# TechBench Core - XFCE desktop foundation
+
+# Debian Live runtime
+user-setup
+sudo
+live-tools
+eject
+
+# X / desktop
+xorg
+xfce4
+xfce4-terminal
+xfce4-power-manager
+xfce4-notifyd
+xfce4-whiskermenu-plugin
+
+# Display manager
+lightdm
+lightdm-gtk-greeter
+
+# File management / removable media
+thunar-volman
+gvfs
+gvfs-backends
+
+# Privilege authentication
+mate-polkit
+
+# Networking
+network-manager
+network-manager-gnome
+
+# Audio
+pipewire-audio
+pavucontrol

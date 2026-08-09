@@ -39,3 +39,7 @@ project/out/
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# TechBench build artifacts
+/.build/
+/out/
