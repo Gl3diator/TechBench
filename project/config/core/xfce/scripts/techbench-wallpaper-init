@@ -10,7 +10,7 @@ MARKER="${XDG_CONFIG_HOME:-${HOME}/.config}/techbench/wallpaper-initialized"
 # Do not override a user's wallpaper again after initial setup.
 [[ -e "${MARKER}" ]] && exit 0
 
-# Give the graphical session a moment to finish starting.
+# Wait briefly for the graphical session and RandR outputs.
 for _ in $(seq 1 40); do
     if xrandr --query >/dev/null 2>&1 &&
        xfconf-query -c xfce4-desktop -lv >/dev/null 2>&1; then
@@ -60,10 +60,11 @@ for monitor in "${MONITORS[@]}"; do
             string \
             "${WALLPAPER}"
 
+        # XFCE image-style 3 = Stretched.
         set_property \
             "${base}/image-style" \
             int \
-            "1"
+            "3"
     done
 done
 

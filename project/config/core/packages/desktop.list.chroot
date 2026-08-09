@@ -18,6 +18,10 @@ xfce4-notifyd
 xfce4-whiskermenu-plugin
 xfce4-pulseaudio-plugin
 
+# Virtual machine integration
+# Allows SPICE/QEMU viewers to dynamically resize the XFCE session.
+spice-vdagent
+
 # Display manager
 lightdm
 lightdm-gtk-greeter
