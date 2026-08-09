@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfwm4" version="1.0">
+
+  <property name="general" type="empty">
+    <property name="theme" type="string" value="Fluent-Dark-compact"/>
+    <property name="button-layout" type="string" value="O|SHMC"/>
+    <property name="click-to-focus" type="bool" value="true"/>
+    <property name="title-alignment" type="string" value="center"/>
+    <property name="tile-on-move" type="bool" value="true"/>
+    <property name="use-compositing" type="bool" value="true"/>
+  </property>
+
+</channel>
