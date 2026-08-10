@@ -34,6 +34,7 @@ configure_live_build() {
             --distribution "${DISTRIBUTION}" \
             --architectures "${ARCHITECTURE}" \
             --binary-images iso-hybrid \
+            --archive-areas "main non-free-firmware" \
             --apt-recommends false
     )
 }

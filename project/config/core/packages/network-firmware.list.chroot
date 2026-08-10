@@ -1,0 +1,37 @@
+# TechBench Core - Wi-Fi and Bluetooth support
+#
+# Linux kernel drivers are included separately.
+# These packages provide firmware required by common network hardware.
+
+# Intel Wi-Fi
+firmware-iwlwifi
+
+# Realtek network / Wi-Fi / Bluetooth-related firmware
+firmware-realtek
+
+# Qualcomm Atheros Wi-Fi firmware
+firmware-atheros
+
+# Broadcom / Cypress Wi-Fi firmware
+firmware-brcm80211
+
+# MediaTek / Ralink networking firmware
+firmware-mediatek
+
+# Marvell wireless firmware
+firmware-libertas
+
+# Texas Instruments Wi-Fi / Bluetooth firmware
+firmware-ti-connectivity
+
+# Miscellaneous firmware used by additional kernel drivers
+firmware-misc-nonfree
+
+# Additional Bluetooth device firmware
+bluez-firmware
+
+# Linux Bluetooth stack
+bluez
+
+# Graphical Bluetooth manager
+blueman

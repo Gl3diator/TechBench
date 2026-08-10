@@ -1,0 +1,178 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+ "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
+
+<Menu>
+  <Name>Applications</Name>
+
+  <Menu>
+    <Name>Testing</Name>
+
+    <DefaultLayout
+      show_empty="true"
+      inline="false"
+      inline_limit="0"
+      inline_header="true"
+      inline_alias="false">
+      <Merge type="menus"/>
+      <Merge type="files"/>
+    </DefaultLayout>
+
+    <Menu>
+      <Name>Hardware &amp; Specs</Name>
+      <Include>
+        <Category>X-TechBench-HardwareSpecs</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Storage</Name>
+      <Include>
+        <Category>X-TechBench-Storage</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Battery</Name>
+      <Include>
+        <Category>X-TechBench-Battery</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Temperatures &amp; Cooling</Name>
+      <Include>
+        <Category>X-TechBench-TemperaturesCooling</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Memory</Name>
+      <Include>
+        <Category>X-TechBench-Memory</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Display</Name>
+      <Include>
+        <Category>X-TechBench-Display</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Keyboard &amp; Touchpad</Name>
+      <Include>
+        <Category>X-TechBench-KeyboardTouchpad</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>CPU</Name>
+      <Include>
+        <Category>X-TechBench-CPU</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>GPU</Name>
+      <Include>
+        <Category>X-TechBench-GPU</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Charging</Name>
+      <Include>
+        <Category>X-TechBench-Charging</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Wi-Fi</Name>
+      <Include>
+        <Category>X-TechBench-WiFi</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Camera</Name>
+      <Include>
+        <Category>X-TechBench-Camera</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Speakers &amp; Microphone</Name>
+      <Include>
+        <Category>X-TechBench-SpeakersMicrophone</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>USB Ports</Name>
+      <Include>
+        <Category>X-TechBench-USBPorts</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Bluetooth</Name>
+      <Include>
+        <Category>X-TechBench-Bluetooth</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Ethernet</Name>
+      <Include>
+        <Category>X-TechBench-Ethernet</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>HDMI / External Display</Name>
+      <Include>
+        <Category>X-TechBench-ExternalDisplay</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>Headphone Jack</Name>
+      <Include>
+        <Category>X-TechBench-HeadphoneJack</Category>
+      </Include>
+    </Menu>
+
+    <Menu>
+      <Name>SD Card Reader</Name>
+      <Include>
+        <Category>X-TechBench-SDCard</Category>
+      </Include>
+    </Menu>
+
+    <Layout>
+      <Menuname show_empty="true">Hardware &amp; Specs</Menuname>
+      <Menuname show_empty="true">Storage</Menuname>
+      <Menuname show_empty="true">Battery</Menuname>
+      <Menuname show_empty="true">Temperatures &amp; Cooling</Menuname>
+      <Menuname show_empty="true">Memory</Menuname>
+      <Menuname show_empty="true">Display</Menuname>
+      <Menuname show_empty="true">Keyboard &amp; Touchpad</Menuname>
+      <Menuname show_empty="true">CPU</Menuname>
+      <Menuname show_empty="true">GPU</Menuname>
+      <Menuname show_empty="true">Charging</Menuname>
+      <Menuname show_empty="true">Wi-Fi</Menuname>
+      <Menuname show_empty="true">Camera</Menuname>
+      <Menuname show_empty="true">Speakers &amp; Microphone</Menuname>
+      <Menuname show_empty="true">USB Ports</Menuname>
+      <Menuname show_empty="true">Bluetooth</Menuname>
+      <Menuname show_empty="true">Ethernet</Menuname>
+      <Menuname show_empty="true">HDMI / External Display</Menuname>
+      <Menuname show_empty="true">Headphone Jack</Menuname>
+      <Menuname show_empty="true">SD Card Reader</Menuname>
+      <Merge type="files"/>
+      <Merge type="menus"/>
+    </Layout>
+
+  </Menu>
+</Menu>
