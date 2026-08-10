@@ -4,6 +4,49 @@
 <Menu>
   <Name>Applications</Name>
 
+  <DefaultAppDirs/>
+  <DefaultDirectoryDirs/>
+
+  <Menu>
+    <Name>Settings</Name>
+    <Directory>xfce-settings.directory</Directory>
+    <Include>
+      <Category>Settings</Category>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Accessories</Name>
+    <Directory>xfce-accessories.directory</Directory>
+    <Include>
+      <Category>Utility</Category>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Internet</Name>
+    <Directory>xfce-network.directory</Directory>
+    <Include>
+      <Category>Network</Category>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>Multimedia</Name>
+    <Directory>xfce-multimedia.directory</Directory>
+    <Include>
+      <Category>AudioVideo</Category>
+    </Include>
+  </Menu>
+
+  <Menu>
+    <Name>System</Name>
+    <Directory>xfce-system.directory</Directory>
+    <Include>
+      <Category>System</Category>
+    </Include>
+  </Menu>
+
   <Menu>
     <Name>Testing</Name>
 
@@ -170,9 +213,17 @@
       <Menuname show_empty="true">HDMI / External Display</Menuname>
       <Menuname show_empty="true">Headphone Jack</Menuname>
       <Menuname show_empty="true">SD Card Reader</Menuname>
-      <Merge type="files"/>
-      <Merge type="menus"/>
     </Layout>
 
   </Menu>
+
+  <Layout>
+    <Menuname>Settings</Menuname>
+    <Menuname>Accessories</Menuname>
+    <Menuname>Internet</Menuname>
+    <Menuname>Multimedia</Menuname>
+    <Menuname>System</Menuname>
+    <Menuname>Testing</Menuname>
+  </Layout>
+
 </Menu>

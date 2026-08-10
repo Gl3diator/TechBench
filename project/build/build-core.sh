@@ -61,7 +61,7 @@ mkdir -p \
     "${WORKSPACE}/config/package-lists" \
     "${INCLUDES}/etc/skel/.config/xfce4" \
     "${INCLUDES}/etc/xdg/autostart" \
-    "${INCLUDES}/etc/xdg/menus/applications-merged" \
+    "${INCLUDES}/etc/xdg/menus" \
     "${INCLUDES}/usr/local/bin" \
     "${INCLUDES}/usr/share/applications" \
     "${INCLUDES}/usr/share/techbench/branding" \
@@ -82,11 +82,11 @@ cp -a \
     "${PROJECT_ROOT}/project/config/core/xfce/xfconf" \
     "${INCLUDES}/etc/skel/.config/xfce4/"
 
-echo "==> Adding TechBench Testing menu"
+echo "==> Adding TechBench application menu"
 
 install -m 0644 \
-    "${PROJECT_ROOT}/project/config/core/menus/techbench-testing.menu" \
-    "${INCLUDES}/etc/xdg/menus/applications-merged/techbench-testing.menu"
+    "${PROJECT_ROOT}/project/config/core/menus/techbench-applications.menu" \
+    "${INCLUDES}/etc/xdg/menus/techbench-applications.menu"
 
 echo "==> Adding TechBench Testing launchers"
 
