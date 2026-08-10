@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Charging & Power Status
+Comment=Check battery charging state and power information
+Exec=gnome-power-statistics
+Icon=battery
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Charging;

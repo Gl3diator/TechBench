@@ -48,8 +48,9 @@ python3-gi
 python3-gi-cairo
 lsb-release
 
-# Battery information backend
+# Battery / charging information
 upower
+gnome-power-manager
 
 # GTK dialogs for TechBench wrappers
 zenity
