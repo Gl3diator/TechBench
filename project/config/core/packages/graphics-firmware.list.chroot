@@ -1,0 +1,10 @@
+# TechBench Core - graphics firmware
+
+# AMD / Radeon
+firmware-amd-graphics
+
+# Intel integrated graphics
+firmware-intel-graphics
+
+# NVIDIA firmware used by the open-source Nouveau driver
+firmware-nvidia-graphics

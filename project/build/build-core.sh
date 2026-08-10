@@ -6,7 +6,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 THEME_CONFIG="${PROJECT_ROOT}/project/config/core/themes/fluent.env"
+GPU_VIEWER_CONFIG="${PROJECT_ROOT}/project/config/core/apps/gpu-viewer.env"
+
 source "${THEME_CONFIG}"
+source "${GPU_VIEWER_CONFIG}"
 
 require_command() {
     local command_name="$1"
@@ -47,6 +50,8 @@ fetch_pinned_repo() {
 
 require_command git
 require_command sassc
+require_command meson
+require_command ninja
 
 echo "==> Preparing TechBench Core build"
 
@@ -56,6 +61,7 @@ configure_live_build "${WORKSPACE}"
 
 INCLUDES="${WORKSPACE}/config/includes.chroot"
 THEME_SOURCE_DIR="${WORKSPACE}/theme-sources"
+APP_SOURCE_DIR="${WORKSPACE}/app-sources"
 
 mkdir -p \
     "${WORKSPACE}/config/package-lists" \
@@ -68,7 +74,8 @@ mkdir -p \
     "${INCLUDES}/usr/share/themes" \
     "${INCLUDES}/usr/share/icons" \
     "${INCLUDES}/usr/share/doc/techbench/third-party" \
-    "${THEME_SOURCE_DIR}"
+    "${THEME_SOURCE_DIR}" \
+    "${APP_SOURCE_DIR}"
 
 echo "==> Adding TechBench Core package lists"
 
@@ -142,6 +149,51 @@ install -m 0644 \
     "${PROJECT_ROOT}/res/img/logo/techbench-home.png" \
     "${INCLUDES}/usr/share/techbench/branding/techbench-home.png"
 
+echo "==> Fetching pinned GPU-Viewer ${GPU_VIEWER_VERSION}"
+
+fetch_pinned_repo \
+    "${GPU_VIEWER_REPO}" \
+    "${GPU_VIEWER_COMMIT}" \
+    "${APP_SOURCE_DIR}/GPU-Viewer"
+
+echo "==> Installing GPU-Viewer ${GPU_VIEWER_VERSION}"
+
+(
+    cd "${APP_SOURCE_DIR}/GPU-Viewer"
+
+    meson setup \
+        _build \
+        --prefix=/usr \
+        --buildtype=release
+
+    ninja -C _build
+
+    DESTDIR="${INCLUDES}" \
+        ninja -C _build install
+)
+
+# TechBench provides its own descriptive "GPU Information" launcher.
+# Hide the upstream GPU-Viewer menu entry to avoid duplicate/confusing names.
+rm -f \
+    "${INCLUDES}/usr/share/applications/io.github.arunsivaramanneo.GPUViewer.desktop"
+
+echo "==> Preserving GPU-Viewer license information"
+
+mkdir -p \
+    "${INCLUDES}/usr/share/doc/techbench/third-party/GPU-Viewer"
+
+install -m 0644 \
+    "${APP_SOURCE_DIR}/GPU-Viewer/LICENSE" \
+    "${INCLUDES}/usr/share/doc/techbench/third-party/GPU-Viewer/LICENSE"
+
+cat > "${INCLUDES}/usr/share/doc/techbench/third-party/GPU-Viewer/SOURCE" <<META
+Project: GPU-Viewer
+Repository: ${GPU_VIEWER_REPO}
+Version: ${GPU_VIEWER_VERSION}
+Commit: ${GPU_VIEWER_COMMIT}
+License: GPL-3.0-or-later
+META
+
 echo "==> Fetching pinned Fluent GTK theme"
 
 fetch_pinned_repo \
@@ -205,7 +257,9 @@ Commit: ${FLUENT_ICON_COMMIT}
 License: GPL-3.0
 META
 
-rm -rf "${THEME_SOURCE_DIR}"
+rm -rf \
+    "${THEME_SOURCE_DIR}" \
+    "${APP_SOURCE_DIR}"
 
 echo "==> Building TechBench Core"
 

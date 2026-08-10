@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="GPU Stress Test"
+
+if ! command -v glmark2 >/dev/null 2>&1; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The GPU stress-testing backend is unavailable."
+    exit 1
+fi
+
+DURATION="$(
+    zenity \
+        --list \
+        --radiolist \
+        --title="${TITLE}" \
+        --text="Choose how long to load the GPU." \
+        --column="Select" \
+        --column="Duration" \
+        TRUE "5 minutes" \
+        FALSE "2 minutes" \
+        FALSE "10 minutes" \
+        --width=420 \
+        --height=300
+)" || exit 0
+
+case "${DURATION}" in
+    "2 minutes")
+        TIMEOUT="120s"
+        ;;
+    "5 minutes")
+        TIMEOUT="300s"
+        ;;
+    "10 minutes")
+        TIMEOUT="600s"
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --ok-label="Start GPU Test" \
+    --cancel-label="Cancel" \
+    --width=540 \
+    --text="A fullscreen graphics workload will run for up to ${DURATION}.
+
+Watch for:
+• visible artifacts or corruption
+• driver crashes
+• system freezes
+• abnormal temperatures
+• severe throttling
+
+You may close the graphics test early if necessary."; then
+    exit 0
+fi
+
+LOG="$(mktemp)"
+trap 'rm -f "${LOG}"' EXIT
+
+set +e
+
+timeout \
+    --signal=TERM \
+    "${TIMEOUT}" \
+    glmark2 \
+        --fullscreen \
+        --run-forever \
+        --annotate \
+        > "${LOG}" 2>&1
+
+STATUS=$?
+
+set -e
+
+# GNU timeout returns 124 when the requested time limit was reached.
+if [[ "${STATUS}" -eq 0 || "${STATUS}" -eq 124 ]]; then
+    zenity \
+        --info \
+        --title="${TITLE}" \
+        --width=480 \
+        --text="GPU workload finished.
+
+TechBench did not detect that the graphics process itself crashed.
+
+You must still visually judge artifacts, temperatures, throttling and abnormal behavior."
+else
+    zenity \
+        --warning \
+        --title="${TITLE}" \
+        --width=520 \
+        --text="The graphics workload exited unexpectedly.
+
+Exit status: ${STATUS}
+
+This may indicate a graphics/driver problem, but it does not automatically prove the GPU is defective."
+fi

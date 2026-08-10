@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="Full Memory Test"
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --width=540 \
+    --ok-label="Restart Now" \
+    --cancel-label="Cancel" \
+    --text="The full memory test runs outside the TechBench desktop.
+
+Save any files or reports before continuing.
+
+After the computer restarts, choose the memory test entry from the TechBench boot menu.
+
+Restart now?"; then
+    exit 0
+fi
+
+systemctl reboot

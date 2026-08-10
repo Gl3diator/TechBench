@@ -20,11 +20,42 @@ kdiskmark
 # Quick in-Linux memory testing
 memtester
 
+# CPU stress testing backend
+stress-ng
+
+# GPU graphics workload / stress testing
+glmark2-x11
+vkmark
+
+# GPU information backends used by GPU-Viewer
+mesa-utils
+vulkan-tools
+clinfo
+vdpauinfo
+x11-utils
+gawk
+
+# Mesa Vulkan / OpenCL support
+mesa-vulkan-drivers
+mesa-opencl-icd
+
+# GPU-Viewer GTK4 runtime
+gir1.2-adw-1
+gir1.2-gtk-4.0
+python3-cairo
+python3-click
+python3-gi
+python3-gi-cairo
+lsb-release
+
 # Battery information backend
 upower
 
-# GTK dialogs for TechBench GUI wrappers
+# GTK dialogs for TechBench wrappers
 zenity
+
+# Screen-test GUI runtime
+python3-tk
 
 # Webcam testing
 guvcview

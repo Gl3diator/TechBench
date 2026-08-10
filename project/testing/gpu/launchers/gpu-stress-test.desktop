@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GPU Stress Test
+Comment=Load the graphics processor and check for crashes, artifacts and overheating
+Exec=/usr/local/bin/techbench-gpu-stress-test
+Icon=video-display
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-GPU;

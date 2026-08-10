@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Screen / Dead Pixel Test
+Comment=Inspect the display using fullscreen solid colors
+Exec=/usr/local/bin/techbench-screen-test
+Icon=video-display
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Display;

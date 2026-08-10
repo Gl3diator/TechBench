@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=GPU Information
+Comment=View graphics hardware, OpenGL, Vulkan and OpenCL information
+Exec=gpu-viewer
+Icon=video-display
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-GPU;

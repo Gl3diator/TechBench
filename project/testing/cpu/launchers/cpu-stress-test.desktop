@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=CPU Stress Test
+Comment=Load all CPU cores to check stability and cooling
+Exec=/usr/local/bin/techbench-cpu-stress-test
+Icon=utilities-system-monitor
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-CPU;

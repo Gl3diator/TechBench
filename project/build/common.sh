@@ -35,6 +35,7 @@ configure_live_build() {
             --architectures "${ARCHITECTURE}" \
             --binary-images iso-hybrid \
             --archive-areas "main non-free-firmware" \
+            --memtest memtest86+ \
             --apt-recommends false
     )
 }

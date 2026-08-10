@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="CPU Stress Test"
+
+if ! command -v stress-ng >/dev/null 2>&1; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The CPU stress-testing backend is unavailable."
+    exit 1
+fi
+
+DURATION="$(
+    zenity \
+        --list \
+        --radiolist \
+        --title="${TITLE}" \
+        --text="Choose how long to stress the CPU." \
+        --column="Select" \
+        --column="Duration" \
+        TRUE "5 minutes" \
+        FALSE "1 minute" \
+        FALSE "10 minutes" \
+        --width=420 \
+        --height=300
+)" || exit 0
+
+case "${DURATION}" in
+    "1 minute")
+        TIMEOUT="60s"
+        ;;
+    "5 minutes")
+        TIMEOUT="300s"
+        ;;
+    "10 minutes")
+        TIMEOUT="600s"
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --ok-label="Start Test" \
+    --cancel-label="Cancel" \
+    --width=520 \
+    --text="This test will place a heavy load on all available CPU cores for ${DURATION}.
+
+Keep Temperatures & Fans open while testing.
+
+Stop the test if temperatures become excessive, the machine becomes unstable, or cooling behaves abnormally."; then
+    exit 0
+fi
+
+LOG="$(mktemp)"
+trap 'rm -f "${LOG}"' EXIT
+
+set +e
+
+stress-ng \
+    --cpu 0 \
+    --verify \
+    --tz \
+    --timeout "${TIMEOUT}" \
+    --metrics-brief \
+    > "${LOG}" 2>&1
+
+STATUS=$?
+
+set -e
+
+if [[ "${STATUS}" -eq 0 ]]; then
+    {
+        echo "RESULT: TEST COMPLETED"
+        echo
+        echo "No stress-ng verification failure was reported."
+        echo
+        echo "This does not by itself guarantee that the CPU or cooling system is perfect."
+        echo
+        echo "Detailed output"
+        echo "---------------"
+        cat "${LOG}"
+    } > "${LOG}.result"
+else
+    {
+        echo "RESULT: TEST DID NOT COMPLETE SUCCESSFULLY"
+        echo
+        echo "Exit status: ${STATUS}"
+        echo
+        echo "Review the output below and check temperatures/system stability."
+        echo
+        cat "${LOG}"
+    } > "${LOG}.result"
+fi
+
+zenity \
+    --text-info \
+    --title="${TITLE}" \
+    --filename="${LOG}.result" \
+    --width=720 \
+    --height=560
+
+rm -f "${LOG}.result"

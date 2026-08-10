@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Full Memory Test (Restart Required)
+Comment=Restart into the standalone full-system memory tester
+Exec=/usr/local/bin/techbench-full-memory-test
+Icon=memory
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Memory;
