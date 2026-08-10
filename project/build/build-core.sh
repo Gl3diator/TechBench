@@ -61,6 +61,7 @@ mkdir -p \
     "${WORKSPACE}/config/package-lists" \
     "${INCLUDES}/etc/skel/.config/xfce4" \
     "${INCLUDES}/etc/xdg/autostart" \
+    "${INCLUDES}/etc/xdg/menus/applications-merged" \
     "${INCLUDES}/usr/local/bin" \
     "${INCLUDES}/usr/share/techbench/branding" \
     "${INCLUDES}/usr/share/themes" \
@@ -79,6 +80,12 @@ echo "==> Adding TechBench XFCE defaults"
 cp -a \
     "${PROJECT_ROOT}/project/config/core/xfce/xfconf" \
     "${INCLUDES}/etc/skel/.config/xfce4/"
+
+echo "==> Adding TechBench Testing menu"
+
+install -m 0644 \
+    "${PROJECT_ROOT}/project/config/core/menus/techbench-testing.menu" \
+    "${INCLUDES}/etc/xdg/menus/applications-merged/techbench-testing.menu"
 
 echo "==> Adding TechBench wallpaper initializer"
 
