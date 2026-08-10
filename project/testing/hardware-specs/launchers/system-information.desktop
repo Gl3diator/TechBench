@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=System Information
+Comment=View hardware specifications and system information
+Exec=hardinfo2
+Icon=computer
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-HardwareSpecs;

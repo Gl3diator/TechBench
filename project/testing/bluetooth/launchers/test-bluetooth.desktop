@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Connect & Test Bluetooth
+Comment=Scan for Bluetooth devices, pair and verify connections
+Exec=blueman-manager
+Icon=bluetooth
+Terminal=false
+StartupNotify=true
+Categories=Network;X-TechBench-Bluetooth;

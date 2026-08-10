@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Drive Health & Self-Test
+Comment=Inspect SMART health information and run drive self-tests
+Exec=gsmartcontrol-root
+Icon=gsmartcontrol
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Storage;

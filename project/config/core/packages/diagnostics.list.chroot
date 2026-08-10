@@ -1,0 +1,18 @@
+# TechBench Core - GUI diagnostic applications
+
+# CPU information
+cpu-x
+
+# General hardware and system information
+hardinfo2
+
+# Temperature and fan monitoring
+psensor
+lm-sensors
+
+# Storage SMART health and self-tests
+gsmartcontrol
+smartmontools
+
+# Webcam testing
+guvcview

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Connect & Test Wi-Fi
+Comment=View and manage Wi-Fi network connections
+Exec=nm-connection-editor
+Icon=network-wireless
+Terminal=false
+StartupNotify=true
+Categories=Network;X-TechBench-WiFi;

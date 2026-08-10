@@ -63,6 +63,7 @@ mkdir -p \
     "${INCLUDES}/etc/xdg/autostart" \
     "${INCLUDES}/etc/xdg/menus/applications-merged" \
     "${INCLUDES}/usr/local/bin" \
+    "${INCLUDES}/usr/share/applications" \
     "${INCLUDES}/usr/share/techbench/branding" \
     "${INCLUDES}/usr/share/themes" \
     "${INCLUDES}/usr/share/icons" \
@@ -86,6 +87,19 @@ echo "==> Adding TechBench Testing menu"
 install -m 0644 \
     "${PROJECT_ROOT}/project/config/core/menus/techbench-testing.menu" \
     "${INCLUDES}/etc/xdg/menus/applications-merged/techbench-testing.menu"
+
+echo "==> Adding TechBench Testing launchers"
+
+while IFS= read -r -d '' launcher; do
+    install -m 0644 \
+        "${launcher}" \
+        "${INCLUDES}/usr/share/applications/$(basename "${launcher}")"
+done < <(
+    find "${PROJECT_ROOT}/project/testing" \
+        -type f \
+        -path '*/launchers/*.desktop' \
+        -print0
+)
 
 echo "==> Adding TechBench wallpaper initializer"
 

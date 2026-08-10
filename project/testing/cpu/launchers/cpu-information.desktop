@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=CPU Information
+Comment=View processor, motherboard, memory and clock information
+Exec=cpu-x
+Icon=cpu-x
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-CPU;

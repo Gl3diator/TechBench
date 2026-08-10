@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Resolution & Refresh Rate
+Comment=View and configure display resolution, refresh rate and connected monitors
+Exec=xfce4-display-settings
+Icon=video-display
+Terminal=false
+StartupNotify=true
+Categories=Settings;X-TechBench-Display;

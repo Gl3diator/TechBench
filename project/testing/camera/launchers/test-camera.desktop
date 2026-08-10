@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Test Camera
+Comment=Open the webcam feed to verify camera operation
+Exec=guvcview
+Icon=camera-web
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;X-TechBench-Camera;

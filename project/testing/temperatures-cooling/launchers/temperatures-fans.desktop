@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Temperatures & Fans
+Comment=Monitor temperatures, cooling sensors and available fan speeds
+Exec=psensor
+Icon=psensor
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-TemperaturesCooling;
