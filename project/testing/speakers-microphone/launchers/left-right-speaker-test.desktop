@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Left / Right Speaker Test
+Comment=Verify left and right speaker channels using the ALSA speaker test
+Exec=xfce4-terminal --title=Left / Right Speaker Test --hold --command="speaker-test -c 2 -t wav -l 1"
+Icon=audio-speakers
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;X-TechBench-SpeakersMicrophone;

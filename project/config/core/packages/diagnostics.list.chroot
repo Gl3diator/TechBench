@@ -54,8 +54,12 @@ upower
 # GTK dialogs for TechBench wrappers
 zenity
 
-# Screen-test GUI runtime
+# Screen / keyboard test GUI runtime
 python3-tk
 
 # Webcam testing
 guvcview
+
+# Audio testing
+alsa-utils
+gnome-sound-recorder

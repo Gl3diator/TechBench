@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Audio Devices & Levels
+Comment=Select and inspect speaker, headphone and microphone devices and levels
+Exec=pavucontrol
+Icon=multimedia-volume-control
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;X-TechBench-SpeakersMicrophone;

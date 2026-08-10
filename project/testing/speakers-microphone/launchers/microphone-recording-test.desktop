@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Microphone Recording Test
+Comment=Record and play back audio to verify microphone operation
+Exec=gnome-sound-recorder
+Icon=audio-input-microphone
+Terminal=false
+StartupNotify=true
+Categories=AudioVideo;X-TechBench-SpeakersMicrophone;
