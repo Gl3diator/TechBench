@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Keyboard & Touchpad Test
+Comment=Test keyboard keys, touchpad movement, clicking and scrolling
+Exec=/usr/local/bin/techbench-keyboard-touchpad-test
+Icon=input-keyboard
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-KeyboardTouchpad;

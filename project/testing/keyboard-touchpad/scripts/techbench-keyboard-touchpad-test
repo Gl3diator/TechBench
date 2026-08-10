@@ -1,0 +1,325 @@
+#!/usr/bin/env python3
+
+import tkinter as tk
+from tkinter import ttk
+
+
+class InputTester:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("TechBench - Keyboard & Touchpad Test")
+        self.root.minsize(900, 650)
+
+        try:
+            self.root.attributes("-zoomed", True)
+        except tk.TclError:
+            pass
+
+        self.key_widgets = {}
+        self.keys_pressed = 0
+        self.pointer_events = 0
+        self.left_clicks = 0
+        self.middle_clicks = 0
+        self.right_clicks = 0
+        self.scroll_events = 0
+
+        self.default_key_bg = "#303030"
+        self.active_key_bg = "#2e8b57"
+        self.key_fg = "#ffffff"
+
+        self.build_ui()
+        self.bind_events()
+
+        self.root.after(250, self.root.focus_force)
+
+    def build_ui(self):
+        main = ttk.Frame(self.root, padding=14)
+        main.pack(fill="both", expand=True)
+
+        title = ttk.Label(
+            main,
+            text="Keyboard & Touchpad Test",
+            font=("Sans", 22, "bold"),
+        )
+        title.pack(anchor="w")
+
+        instructions = ttk.Label(
+            main,
+            text=(
+                "Press every keyboard key and verify it registers below. "
+                "Move the pointer using the touchpad, test left/right clicks, "
+                "and scroll up/down. This test checks basic input operation; "
+                "advanced multi-touch gestures are not tested."
+            ),
+            wraplength=1100,
+            justify="left",
+        )
+        instructions.pack(anchor="w", pady=(4, 12))
+
+        status_frame = ttk.Frame(main)
+        status_frame.pack(fill="x", pady=(0, 12))
+
+        self.last_key_var = tk.StringVar(value="Last key: None")
+        self.key_count_var = tk.StringVar(value="Key presses: 0")
+        self.pointer_var = tk.StringVar(value="Pointer movement: waiting")
+        self.click_var = tk.StringVar(value="Clicks: L 0   M 0   R 0")
+        self.scroll_var = tk.StringVar(value="Scroll events: 0")
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.last_key_var,
+            font=("Sans", 13, "bold"),
+        ).grid(row=0, column=0, sticky="w", padx=(0, 25))
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.key_count_var,
+        ).grid(row=0, column=1, sticky="w", padx=(0, 25))
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.pointer_var,
+        ).grid(row=1, column=0, sticky="w", padx=(0, 25), pady=(4, 0))
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.click_var,
+        ).grid(row=1, column=1, sticky="w", padx=(0, 25), pady=(4, 0))
+
+        ttk.Label(
+            status_frame,
+            textvariable=self.scroll_var,
+        ).grid(row=1, column=2, sticky="w", pady=(4, 0))
+
+        keyboard_box = ttk.LabelFrame(main, text="Keyboard", padding=10)
+        keyboard_box.pack(fill="x", pady=(0, 12))
+
+        keyboard_rows = [
+            [
+                ("Esc", "Escape"),
+                ("F1", "F1"), ("F2", "F2"), ("F3", "F3"), ("F4", "F4"),
+                ("F5", "F5"), ("F6", "F6"), ("F7", "F7"), ("F8", "F8"),
+                ("F9", "F9"), ("F10", "F10"), ("F11", "F11"), ("F12", "F12"),
+                ("PrtSc", "Print"),
+            ],
+            [
+                ("`", "grave"),
+                ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"),
+                ("6", "6"), ("7", "7"), ("8", "8"), ("9", "9"), ("0", "0"),
+                ("-", "minus"), ("=", "equal"), ("Backspace", "BackSpace"),
+            ],
+            [
+                ("Tab", "Tab"),
+                ("Q", "q"), ("W", "w"), ("E", "e"), ("R", "r"), ("T", "t"),
+                ("Y", "y"), ("U", "u"), ("I", "i"), ("O", "o"), ("P", "p"),
+                ("[", "bracketleft"), ("]", "bracketright"),
+                ("\\", "backslash"),
+            ],
+            [
+                ("Caps", "Caps_Lock"),
+                ("A", "a"), ("S", "s"), ("D", "d"), ("F", "f"), ("G", "g"),
+                ("H", "h"), ("J", "j"), ("K", "k"), ("L", "l"),
+                (";", "semicolon"), ("'", "apostrophe"), ("Enter", "Return"),
+            ],
+            [
+                ("Shift", "Shift_L"),
+                ("Z", "z"), ("X", "x"), ("C", "c"), ("V", "v"), ("B", "b"),
+                ("N", "n"), ("M", "m"), (",", "comma"), (".", "period"),
+                ("/", "slash"), ("Shift", "Shift_R"),
+            ],
+            [
+                ("Ctrl", "Control_L"),
+                ("Super", "Super_L"),
+                ("Alt", "Alt_L"),
+                ("Space", "space"),
+                ("Alt", "Alt_R"),
+                ("Ctrl", "Control_R"),
+                ("Left", "Left"),
+                ("Up", "Up"),
+                ("Down", "Down"),
+                ("Right", "Right"),
+            ],
+        ]
+
+        for row_index, row in enumerate(keyboard_rows):
+            row_frame = tk.Frame(keyboard_box)
+            row_frame.pack(fill="x", pady=3)
+
+            for label, keysym in row:
+                width = 7
+
+                if label == "Space":
+                    width = 22
+                elif label in ("Backspace", "Enter"):
+                    width = 10
+                elif label in ("Shift", "Ctrl", "Super"):
+                    width = 8
+
+                widget = tk.Label(
+                    row_frame,
+                    text=label,
+                    width=width,
+                    height=2,
+                    relief="raised",
+                    borderwidth=1,
+                    bg=self.default_key_bg,
+                    fg=self.key_fg,
+                )
+                widget.pack(side="left", padx=2)
+                self.key_widgets[keysym] = widget
+
+        touchpad_box = ttk.LabelFrame(main, text="Touchpad / Mouse", padding=10)
+        touchpad_box.pack(fill="both", expand=True)
+
+        self.canvas = tk.Canvas(
+            touchpad_box,
+            bg="#202020",
+            highlightthickness=1,
+            highlightbackground="#666666",
+            height=180,
+        )
+        self.canvas.pack(fill="both", expand=True)
+
+        self.canvas.create_text(
+            20,
+            20,
+            anchor="nw",
+            text=(
+                "Move the pointer here using the touchpad.\n"
+                "Test left click, right click, middle click if available,\n"
+                "and two-finger or edge scrolling."
+            ),
+            fill="white",
+            font=("Sans", 13),
+            tags="instructions",
+        )
+
+        self.pointer_marker = self.canvas.create_oval(
+            -20, -20, -10, -10,
+            fill="#ffffff",
+            outline="",
+        )
+
+        bottom = ttk.Frame(main)
+        bottom.pack(fill="x", pady=(12, 0))
+
+        ttk.Button(
+            bottom,
+            text="Reset Test",
+            command=self.reset,
+        ).pack(side="left")
+
+        ttk.Button(
+            bottom,
+            text="Exit",
+            command=self.root.destroy,
+        ).pack(side="right")
+
+        ttk.Label(
+            bottom,
+            text="Green keyboard keys have been detected during this session.",
+        ).pack(side="left", padx=20)
+
+    def bind_events(self):
+        self.root.bind_all("<KeyPress>", self.key_press, add="+")
+        self.root.bind_all("<Motion>", self.pointer_move, add="+")
+        self.root.bind_all("<Button-1>", self.left_click, add="+")
+        self.root.bind_all("<Button-2>", self.middle_click, add="+")
+        self.root.bind_all("<Button-3>", self.right_click, add="+")
+        self.root.bind_all("<Button-4>", self.scroll_up, add="+")
+        self.root.bind_all("<Button-5>", self.scroll_down, add="+")
+        self.root.bind_all("<MouseWheel>", self.mouse_wheel, add="+")
+
+    def key_press(self, event):
+        self.keys_pressed += 1
+
+        display = event.keysym
+        if event.char and event.char.isprintable() and not event.char.isspace():
+            display = f"{event.keysym} ({event.char})"
+
+        self.last_key_var.set(f"Last key: {display}")
+        self.key_count_var.set(f"Key presses: {self.keys_pressed}")
+
+        widget = self.key_widgets.get(event.keysym)
+        if widget:
+            widget.configure(bg=self.active_key_bg)
+
+    def pointer_move(self, event):
+        self.pointer_events += 1
+        self.pointer_var.set(
+            f"Pointer movement: detected ({self.pointer_events} events)"
+        )
+
+        if event.widget == self.canvas:
+            radius = 6
+            self.canvas.coords(
+                self.pointer_marker,
+                event.x - radius,
+                event.y - radius,
+                event.x + radius,
+                event.y + radius,
+            )
+
+    def update_click_status(self):
+        self.click_var.set(
+            f"Clicks: L {self.left_clicks}   "
+            f"M {self.middle_clicks}   "
+            f"R {self.right_clicks}"
+        )
+
+    def left_click(self, event):
+        self.left_clicks += 1
+        self.update_click_status()
+
+    def middle_click(self, event):
+        self.middle_clicks += 1
+        self.update_click_status()
+
+    def right_click(self, event):
+        self.right_clicks += 1
+        self.update_click_status()
+
+    def register_scroll(self):
+        self.scroll_events += 1
+        self.scroll_var.set(f"Scroll events: {self.scroll_events}")
+
+    def scroll_up(self, event):
+        self.register_scroll()
+
+    def scroll_down(self, event):
+        self.register_scroll()
+
+    def mouse_wheel(self, event):
+        self.register_scroll()
+
+    def reset(self):
+        self.keys_pressed = 0
+        self.pointer_events = 0
+        self.left_clicks = 0
+        self.middle_clicks = 0
+        self.right_clicks = 0
+        self.scroll_events = 0
+
+        self.last_key_var.set("Last key: None")
+        self.key_count_var.set("Key presses: 0")
+        self.pointer_var.set("Pointer movement: waiting")
+        self.click_var.set("Clicks: L 0   M 0   R 0")
+        self.scroll_var.set("Scroll events: 0")
+
+        for widget in self.key_widgets.values():
+            widget.configure(bg=self.default_key_bg)
+
+        self.canvas.coords(
+            self.pointer_marker,
+            -20, -20, -10, -10,
+        )
+
+
+def main():
+    root = tk.Tk()
+    InputTester(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
