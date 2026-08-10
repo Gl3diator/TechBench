@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Quick Memory Test
+Comment=Check available system memory for errors without restarting
+Exec=/usr/local/bin/techbench-quick-memory-test
+Icon=utilities-system-monitor
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Memory;

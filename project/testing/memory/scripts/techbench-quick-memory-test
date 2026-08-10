@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="Quick Memory Test"
+
+MEMTESTER="/usr/sbin/memtester"
+
+if [[ ! -x "${MEMTESTER}" ]]; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The memory testing backend is unavailable."
+    exit 1
+fi
+
+AVAILABLE_KB="$(
+    awk '/^MemAvailable:/ { print $2 }' /proc/meminfo
+)"
+
+if [[ -z "${AVAILABLE_KB}" ]]; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="TechBench could not determine available memory."
+    exit 1
+fi
+
+# Use approximately 25% of currently available RAM.
+# Keep enough memory free for the live desktop and other services.
+TEST_MB=$((AVAILABLE_KB / 4096))
+
+if (( TEST_MB > 4096 )); then
+    TEST_MB=4096
+fi
+
+if (( TEST_MB < 128 )); then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="There is not enough free memory to safely start the quick test."
+    exit 1
+fi
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --width=500 \
+    --ok-label="Start Test" \
+    --cancel-label="Cancel" \
+    --text="TechBench will test approximately ${TEST_MB} MiB of currently available RAM.
+
+This is a quick test that runs inside Linux.
+
+It does NOT test every byte of installed RAM. A full boot-level memory test will be added separately using Memtest86+."; then
+    exit 0
+fi
+
+LOG="$(mktemp)"
+RESULT="$(mktemp)"
+
+cleanup() {
+    rm -f "${LOG}" "${RESULT}"
+}
+
+trap cleanup EXIT
+
+"${MEMTESTER}" "${TEST_MB}M" 1 > "${LOG}" 2>&1 &
+TEST_PID=$!
+
+(
+    while kill -0 "${TEST_PID}" >/dev/null 2>&1; do
+        echo "# Testing ${TEST_MB} MiB of memory..."
+        sleep 1
+    done
+) |
+    zenity \
+        --progress \
+        --pulsate \
+        --auto-close \
+        --no-cancel \
+        --title="${TITLE}" \
+        --text="Starting memory test..." \
+        --width=450
+
+if wait "${TEST_PID}"; then
+    STATUS=0
+else
+    STATUS=$?
+fi
+
+if [[ "${STATUS}" -eq 0 ]]; then
+    {
+        echo "RESULT: COMPLETED WITHOUT DETECTED ERRORS"
+        echo
+        echo "Memory tested: ${TEST_MB} MiB"
+        echo "Passes: 1"
+        echo
+        echo "Detailed test output"
+        echo "--------------------"
+        cat "${LOG}"
+    } > "${RESULT}"
+else
+    {
+        echo "RESULT: TEST DID NOT COMPLETE SUCCESSFULLY"
+        echo
+        echo "This does not automatically prove the RAM is defective."
+        echo "Review the detailed output below."
+        echo
+        echo "Memory requested: ${TEST_MB} MiB"
+        echo "Exit status: ${STATUS}"
+        echo
+        echo "Detailed test output"
+        echo "--------------------"
+        cat "${LOG}"
+    } > "${RESULT}"
+fi
+
+zenity \
+    --text-info \
+    --title="${TITLE}" \
+    --filename="${RESULT}" \
+    --width=700 \
+    --height=560

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Drive Speed Test
+Comment=Measure HDD, SSD or NVMe read and write performance
+Exec=/usr/local/bin/techbench-drive-speed-test
+Icon=drive-harddisk
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Storage;

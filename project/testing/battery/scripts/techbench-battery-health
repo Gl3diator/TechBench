@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="Battery Health"
+
+if ! command -v upower >/dev/null 2>&1; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="Battery information service is unavailable."
+    exit 1
+fi
+
+mapfile -t BATTERIES < <(
+    upower -e |
+        grep -E '/battery(_|/)' || true
+)
+
+if [[ "${#BATTERIES[@]}" -eq 0 ]]; then
+    zenity \
+        --info \
+        --title="${TITLE}" \
+        --width=420 \
+        --text="No laptop battery was detected.
+
+This may mean:
+• This computer has no battery
+• The battery is disconnected
+• The hardware or firmware does not expose battery information to Linux"
+    exit 0
+fi
+
+get_field() {
+    local data="$1"
+    local key="$2"
+
+    local value
+
+    value="$(
+        printf '%s\n' "${data}" |
+            awk -F: -v key="${key}" '
+                $1 ~ "^[[:space:]]*" key "[[:space:]]*$" {
+                    sub(/^[[:space:]]+/, "", $2)
+                    print $2
+                    exit
+                }
+            '
+    )"
+
+    if [[ -n "${value}" ]]; then
+        printf '%s' "${value}"
+    else
+        printf '%s' "Unavailable"
+    fi
+}
+
+OUTPUT="$(mktemp)"
+trap 'rm -f "${OUTPUT}"' EXIT
+
+{
+    echo "TECHBENCH BATTERY HEALTH"
+    echo "========================"
+    echo
+
+    battery_number=0
+
+    for battery in "${BATTERIES[@]}"; do
+        ((battery_number += 1))
+
+        INFO="$(upower -i "${battery}")"
+
+        echo "Battery ${battery_number}"
+        echo "---------"
+        echo "Vendor:               $(get_field "${INFO}" "vendor")"
+        echo "Model:                $(get_field "${INFO}" "model")"
+        echo "Serial:               $(get_field "${INFO}" "serial")"
+        echo
+        echo "State:                $(get_field "${INFO}" "state")"
+        echo "Current charge:       $(get_field "${INFO}" "percentage")"
+        echo "Reported capacity:    $(get_field "${INFO}" "capacity")"
+        echo
+        echo "Full-charge energy:   $(get_field "${INFO}" "energy-full")"
+        echo "Design energy:        $(get_field "${INFO}" "energy-full-design")"
+        echo "Charge cycles:        $(get_field "${INFO}" "charge-cycles")"
+        echo "Technology:           $(get_field "${INFO}" "technology")"
+        echo "Voltage:              $(get_field "${INFO}" "voltage")"
+        echo
+        echo "Time to empty:        $(get_field "${INFO}" "time to empty")"
+        echo "Time to full:         $(get_field "${INFO}" "time to full")"
+        echo
+    done
+
+    echo "Unavailable means the laptop did not expose that value through Linux."
+} > "${OUTPUT}"
+
+zenity \
+    --text-info \
+    --title="${TITLE}" \
+    --filename="${OUTPUT}" \
+    --width=650 \
+    --height=560

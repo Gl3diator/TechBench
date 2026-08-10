@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="Drive Speed Test"
+
+if ! command -v kdiskmark >/dev/null 2>&1; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The graphical drive benchmark is unavailable."
+    exit 1
+fi
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --width=520 \
+    --ok-label="Open Drive Speed Test" \
+    --cancel-label="Cancel" \
+    --text="KDiskMark will open next.
+
+Choose the mounted drive or filesystem you actually want to test.
+
+The benchmark creates temporary test data while measuring drive performance.
+
+Do not select the TechBench USB unless you specifically intend to benchmark the USB drive."; then
+    exit 0
+fi
+
+exec kdiskmark

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Battery Health
+Comment=View battery capacity, charge state, cycles and available health information
+Exec=/usr/local/bin/techbench-battery-health
+Icon=battery
+Terminal=false
+StartupNotify=true
+Categories=System;X-TechBench-Battery;

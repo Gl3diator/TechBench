@@ -101,6 +101,23 @@ done < <(
         -print0
 )
 
+echo "==> Adding TechBench Testing scripts"
+
+while IFS= read -r -d '' test_script; do
+    if [[ "$(basename "${test_script}")" == ".gitkeep" ]]; then
+        continue
+    fi
+
+    install -m 0755 \
+        "${test_script}" \
+        "${INCLUDES}/usr/local/bin/$(basename "${test_script}")"
+done < <(
+    find "${PROJECT_ROOT}/project/testing" \
+        -type f \
+        -path '*/scripts/*' \
+        -print0
+)
+
 echo "==> Adding TechBench wallpaper initializer"
 
 install -m 0755 \

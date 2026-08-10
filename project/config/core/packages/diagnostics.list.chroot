@@ -14,5 +14,17 @@ lm-sensors
 gsmartcontrol
 smartmontools
 
+# Graphical storage performance testing
+kdiskmark
+
+# Quick in-Linux memory testing
+memtester
+
+# Battery information backend
+upower
+
+# GTK dialogs for TechBench GUI wrappers
+zenity
+
 # Webcam testing
 guvcview
