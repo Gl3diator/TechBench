@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Log Out / Shut Down
+Comment=Log out, restart, suspend or shut down the computer
+Exec=xfce4-session-logout
+Icon=system-shutdown
+Terminal=false
+StartupNotify=true
+Categories=X-TechBench-Session;

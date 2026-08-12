@@ -1,12 +1,8 @@
-<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
- "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
-
+<?xml version='1.0' encoding='UTF-8'?>
 <Menu>
   <Name>Applications</Name>
-
-  <DefaultAppDirs/>
-  <DefaultDirectoryDirs/>
-
+  <DefaultAppDirs />
+  <DefaultDirectoryDirs />
   <Menu>
     <Name>Settings</Name>
     <Directory>xfce-settings.directory</Directory>
@@ -14,7 +10,6 @@
       <Category>Settings</Category>
     </Include>
   </Menu>
-
   <Menu>
     <Name>Accessories</Name>
     <Directory>xfce-accessories.directory</Directory>
@@ -22,7 +17,6 @@
       <Category>Utility</Category>
     </Include>
   </Menu>
-
   <Menu>
     <Name>Internet</Name>
     <Directory>xfce-network.directory</Directory>
@@ -30,7 +24,6 @@
       <Category>Network</Category>
     </Include>
   </Menu>
-
   <Menu>
     <Name>Multimedia</Name>
     <Directory>xfce-multimedia.directory</Directory>
@@ -38,7 +31,6 @@
       <Category>AudioVideo</Category>
     </Include>
   </Menu>
-
   <Menu>
     <Name>System</Name>
     <Directory>xfce-system.directory</Directory>
@@ -46,153 +38,126 @@
       <Category>System</Category>
     </Include>
   </Menu>
-
   <Menu>
     <Name>Testing</Name>
-
-    <DefaultLayout
-      show_empty="true"
-      inline="false"
-      inline_limit="0"
-      inline_header="true"
-      inline_alias="false">
-      <Merge type="menus"/>
-      <Merge type="files"/>
+    <DefaultLayout show_empty="true" inline="false" inline_limit="0" inline_header="true" inline_alias="false">
+      <Merge type="menus" />
+      <Merge type="files" />
     </DefaultLayout>
-
     <Menu>
       <Name>Hardware &amp; Specs</Name>
       <Include>
         <Category>X-TechBench-HardwareSpecs</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Storage</Name>
       <Include>
         <Category>X-TechBench-Storage</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Battery</Name>
       <Include>
         <Category>X-TechBench-Battery</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Temperatures &amp; Cooling</Name>
       <Include>
         <Category>X-TechBench-TemperaturesCooling</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Memory</Name>
       <Include>
         <Category>X-TechBench-Memory</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Display</Name>
       <Include>
         <Category>X-TechBench-Display</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Keyboard &amp; Touchpad</Name>
       <Include>
         <Category>X-TechBench-KeyboardTouchpad</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>CPU</Name>
       <Include>
         <Category>X-TechBench-CPU</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>GPU</Name>
       <Include>
         <Category>X-TechBench-GPU</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Charging</Name>
       <Include>
         <Category>X-TechBench-Charging</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Wi-Fi</Name>
       <Include>
         <Category>X-TechBench-WiFi</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Camera</Name>
       <Include>
         <Category>X-TechBench-Camera</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Speakers &amp; Microphone</Name>
       <Include>
         <Category>X-TechBench-SpeakersMicrophone</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>USB Ports</Name>
       <Include>
         <Category>X-TechBench-USBPorts</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Bluetooth</Name>
       <Include>
         <Category>X-TechBench-Bluetooth</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Ethernet</Name>
       <Include>
         <Category>X-TechBench-Ethernet</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>HDMI / External Display</Name>
       <Include>
         <Category>X-TechBench-ExternalDisplay</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>Headphone Jack</Name>
       <Include>
         <Category>X-TechBench-HeadphoneJack</Category>
       </Include>
     </Menu>
-
     <Menu>
       <Name>SD Card Reader</Name>
       <Include>
         <Category>X-TechBench-SDCard</Category>
       </Include>
     </Menu>
-
     <Layout>
       <Menuname show_empty="true">Hardware &amp; Specs</Menuname>
       <Menuname show_empty="true">Storage</Menuname>
@@ -214,9 +179,7 @@
       <Menuname show_empty="true">Headphone Jack</Menuname>
       <Menuname show_empty="true">SD Card Reader</Menuname>
     </Layout>
-
   </Menu>
-
   <Layout>
     <Menuname>Settings</Menuname>
     <Menuname>Accessories</Menuname>
@@ -224,6 +187,10 @@
     <Menuname>Multimedia</Menuname>
     <Menuname>System</Menuname>
     <Menuname>Testing</Menuname>
+    <Separator />
+    <Filename>techbench-logout.desktop</Filename>
   </Layout>
-
+  <Include>
+    <Filename>techbench-logout.desktop</Filename>
+  </Include>
 </Menu>

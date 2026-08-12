@@ -125,6 +125,16 @@ done < <(
         -print0
 )
 
+echo "==> Adding TechBench Core launchers"
+
+if compgen -G "${PROJECT_ROOT}/project/config/core/launchers/*.desktop" >/dev/null; then
+    for launcher in "${PROJECT_ROOT}/project/config/core/launchers/"*.desktop; do
+        install -m 0644 \
+            "${launcher}" \
+            "${INCLUDES}/usr/share/applications/$(basename "${launcher}")"
+    done
+fi
+
 echo "==> Adding TechBench wallpaper initializer"
 
 install -m 0755 \
