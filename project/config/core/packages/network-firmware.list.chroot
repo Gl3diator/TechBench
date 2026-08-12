@@ -35,3 +35,6 @@ bluez
 
 # Graphical Bluetooth manager
 blueman
+
+# Wireless radio block-state diagnostics
+rfkill

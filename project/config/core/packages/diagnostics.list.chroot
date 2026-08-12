@@ -67,3 +67,6 @@ guvcview
 # Audio testing
 alsa-utils
 gnome-sound-recorder
+
+# Desktop integration required by HardInfo2
+xdg-utils
