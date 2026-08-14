@@ -45,3 +45,8 @@ pavucontrol
 # TechBench GTK theme runtime support
 gnome-themes-extra
 gtk2-engines-murrine
+
+# Broad Debian audio hardware support
+alsa-ucm-conf
+alsa-topology-conf
+firmware-sof-signed
