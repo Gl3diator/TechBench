@@ -135,6 +135,16 @@ if compgen -G "${PROJECT_ROOT}/project/config/core/launchers/*.desktop" >/dev/nu
     done
 fi
 
+echo "==> Adding TechBench Wi-Fi initializer"
+
+install -m 0755 \
+    "${PROJECT_ROOT}/project/config/core/network/techbench-wifi-init" \
+    "${INCLUDES}/usr/local/bin/techbench-wifi-init"
+
+install -m 0644 \
+    "${PROJECT_ROOT}/project/config/core/xfce/autostart/techbench-wifi-init.desktop" \
+    "${INCLUDES}/etc/xdg/autostart/techbench-wifi-init.desktop"
+
 echo "==> Adding TechBench wallpaper initializer"
 
 install -m 0755 \

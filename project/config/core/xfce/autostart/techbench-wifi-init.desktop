@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=TechBench Wi-Fi Initial Scan
+Comment=Enable Wi-Fi and scan for nearby networks at desktop startup
+Exec=/usr/local/bin/techbench-wifi-init
+Terminal=false
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

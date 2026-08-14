@@ -70,3 +70,12 @@ gnome-sound-recorder
 
 # Desktop integration required by HardInfo2
 xdg-utils
+
+# Privilege escalation for graphical hardware tools
+pkexec
+
+# Safe desktop mounting for selected benchmark targets
+udisks2
+
+# Storage enumeration helpers used by TechBench wrappers
+util-linux

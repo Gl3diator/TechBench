@@ -4,27 +4,216 @@ set -euo pipefail
 
 TITLE="Drive Speed Test"
 
-if ! command -v kdiskmark >/dev/null 2>&1; then
+for cmd in kdiskmark zenity lsblk udisksctl findmnt python3; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+        zenity \
+            --error \
+            --title="${TITLE}" \
+            --text="Required component is unavailable: ${cmd}"
+        exit 1
+    fi
+done
+
+mapfile -t CANDIDATES < <(
+    lsblk -b -J \
+        -o NAME,PATH,TYPE,TRAN,SIZE,FSTYPE,LABEL,MOUNTPOINT,MODEL,RO |
+    python3 -c '
+import json
+import sys
+
+data = json.load(sys.stdin)
+
+def clean(value):
+    if value is None:
+        return ""
+    return str(value).replace("\t", " ").replace("\n", " ").strip()
+
+def walk(node, parent_disk=None):
+    node_type = node.get("type", "")
+    current_disk = parent_disk
+
+    if node_type == "disk":
+        current_disk = node
+
+    if node_type == "part" and current_disk:
+        transport = clean(current_disk.get("tran")).lower()
+        readonly = int(node.get("ro") or 0)
+        size = int(node.get("size") or 0)
+        fstype = clean(node.get("fstype")).lower()
+
+        # Do not offer the TechBench USB or other USB disks.
+        if transport == "usb":
+            pass
+        # Ignore read-only, tiny system partitions, swap and Live media.
+        elif readonly:
+            pass
+        elif size < 1024**3:
+            pass
+        elif not fstype:
+            pass
+        elif fstype in {"swap", "squashfs", "iso9660"}:
+            pass
+        else:
+            fields = [
+                clean(node.get("path")),
+                clean(current_disk.get("model")) or clean(current_disk.get("name")),
+                str(size),
+                fstype,
+                clean(node.get("label")) or "(no label)",
+                clean(node.get("mountpoint")) or "(not mounted)",
+            ]
+            print("\t".join(fields))
+
+    for child in node.get("children") or []:
+        walk(child, current_disk)
+
+for device in data.get("blockdevices", []):
+    walk(device)
+'
+)
+
+if [[ "${#CANDIDATES[@]}" -eq 0 ]]; then
+    zenity \
+        --info \
+        --title="${TITLE}" \
+        --width=520 \
+        --text="No suitable internal filesystem was found.
+
+TechBench excludes:
+• the TechBench USB
+• read-only volumes
+• very small system partitions
+• swap / Live filesystems
+
+If the internal drive is encrypted or has no mountable filesystem, it cannot be benchmarked through KDiskMark in this mode."
+    exit 0
+fi
+
+ROWS=()
+
+for row in "${CANDIDATES[@]}"; do
+    IFS=$'\t' read -r \
+        device \
+        model \
+        size_bytes \
+        fstype \
+        label \
+        mountpoint <<< "${row}"
+
+    size_human="$(numfmt --to=iec --suffix=B "${size_bytes}")"
+
+    ROWS+=(
+        "${device}"
+        "${model}"
+        "${size_human}"
+        "${fstype}"
+        "${label}"
+        "${mountpoint}"
+    )
+done
+
+DEVICE="$(
+    zenity \
+        --list \
+        --title="${TITLE}" \
+        --text="Select the internal partition you want to benchmark." \
+        --width=900 \
+        --height=420 \
+        --column="Device" \
+        --column="Drive" \
+        --column="Size" \
+        --column="Filesystem" \
+        --column="Label" \
+        --column="Mounted At" \
+        --hide-column=1 \
+        --print-column=1 \
+        "${ROWS[@]}"
+)" || exit 0
+
+[[ -n "${DEVICE}" ]] || exit 0
+
+MODEL="$(
+    lsblk -dn -o MODEL "$(lsblk -no PKNAME "${DEVICE}" | sed 's#^#/dev/#')" \
+        2>/dev/null |
+    sed 's/^[[:space:]]*//;s/[[:space:]]*$//' |
+    head -n1
+)"
+
+SIZE="$(lsblk -dn -o SIZE "${DEVICE}" 2>/dev/null | xargs)"
+FSTYPE="$(lsblk -dn -o FSTYPE "${DEVICE}" 2>/dev/null | xargs)"
+
+MOUNTPOINT="$(findmnt -n -o TARGET --source "${DEVICE}" 2>/dev/null || true)"
+
+if [[ -z "${MOUNTPOINT}" ]]; then
+    if ! zenity \
+        --question \
+        --title="${TITLE}" \
+        --width=560 \
+        --ok-label="Mount & Continue" \
+        --cancel-label="Cancel" \
+        --text="Selected target:
+
+Device: ${DEVICE}
+Drive: ${MODEL:-Unknown}
+Size: ${SIZE:-Unknown}
+Filesystem: ${FSTYPE:-Unknown}
+
+This partition is not currently mounted.
+
+TechBench must mount it before KDiskMark can benchmark it.
+
+Mount this partition and continue?"; then
+        exit 0
+    fi
+
+    if ! udisksctl mount -b "${DEVICE}" >/tmp/techbench-udisks-mount.log 2>&1; then
+        zenity \
+            --error \
+            --title="${TITLE}" \
+            --width=600 \
+            --text="TechBench could not mount ${DEVICE}.
+
+$(cat /tmp/techbench-udisks-mount.log)"
+        rm -f /tmp/techbench-udisks-mount.log
+        exit 1
+    fi
+
+    rm -f /tmp/techbench-udisks-mount.log
+
+    MOUNTPOINT="$(findmnt -n -o TARGET --source "${DEVICE}" 2>/dev/null || true)"
+fi
+
+if [[ -z "${MOUNTPOINT}" ]]; then
     zenity \
         --error \
         --title="${TITLE}" \
-        --text="The graphical drive benchmark is unavailable."
+        --text="The selected filesystem was mounted, but TechBench could not determine its mount point."
     exit 1
 fi
 
 if ! zenity \
     --question \
     --title="${TITLE}" \
-    --width=520 \
-    --ok-label="Open Drive Speed Test" \
+    --width=600 \
+    --ok-label="Open KDiskMark" \
     --cancel-label="Cancel" \
-    --text="KDiskMark will open next.
+    --text="Benchmark target:
 
-Choose the mounted drive or filesystem you actually want to test.
+Device: ${DEVICE}
+Drive: ${MODEL:-Unknown}
+Filesystem: ${FSTYPE:-Unknown}
+Mount point: ${MOUNTPOINT}
 
-The benchmark creates temporary test data while measuring drive performance.
+KDiskMark will open next.
 
-Do not select the TechBench USB unless you specifically intend to benchmark the USB drive."; then
+Select this exact location in KDiskMark:
+
+${MOUNTPOINT}
+
+IMPORTANT:
+KDiskMark creates temporary test files and performs write tests when you start the benchmark.
+
+Do not benchmark a drive containing important data unless you accept the additional write activity."; then
     exit 0
 fi
 

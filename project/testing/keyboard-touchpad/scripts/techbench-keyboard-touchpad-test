@@ -36,30 +36,29 @@ class InputTester:
         main = ttk.Frame(self.root, padding=14)
         main.pack(fill="both", expand=True)
 
-        title = ttk.Label(
+        ttk.Label(
             main,
             text="Keyboard & Touchpad Test",
             font=("Sans", 22, "bold"),
-        )
-        title.pack(anchor="w")
+        ).pack(anchor="w")
 
-        instructions = ttk.Label(
+        ttk.Label(
             main,
             text=(
                 "Press every keyboard key and verify it registers below. "
                 "Move the pointer using the touchpad, test left/right clicks, "
-                "and scroll up/down. This test checks basic input operation; "
-                "advanced multi-touch gestures are not tested."
+                "and scroll up/down. Function keys may require Fn depending "
+                "on the laptop's firmware settings."
             ),
             wraplength=1100,
             justify="left",
-        )
-        instructions.pack(anchor="w", pady=(4, 12))
+        ).pack(anchor="w", pady=(4, 12))
 
         status_frame = ttk.Frame(main)
         status_frame.pack(fill="x", pady=(0, 12))
 
         self.last_key_var = tk.StringVar(value="Last key: None")
+        self.raw_key_var = tk.StringVar(value="Raw event: None")
         self.key_count_var = tk.StringVar(value="Key presses: 0")
         self.pointer_var = tk.StringVar(value="Pointer movement: waiting")
         self.click_var = tk.StringVar(value="Clicks: L 0   M 0   R 0")
@@ -78,18 +77,29 @@ class InputTester:
 
         ttk.Label(
             status_frame,
+            textvariable=self.raw_key_var,
+        ).grid(
+            row=1,
+            column=0,
+            columnspan=3,
+            sticky="w",
+            pady=(4, 0),
+        )
+
+        ttk.Label(
+            status_frame,
             textvariable=self.pointer_var,
-        ).grid(row=1, column=0, sticky="w", padx=(0, 25), pady=(4, 0))
+        ).grid(row=2, column=0, sticky="w", padx=(0, 25), pady=(4, 0))
 
         ttk.Label(
             status_frame,
             textvariable=self.click_var,
-        ).grid(row=1, column=1, sticky="w", padx=(0, 25), pady=(4, 0))
+        ).grid(row=2, column=1, sticky="w", padx=(0, 25), pady=(4, 0))
 
         ttk.Label(
             status_frame,
             textvariable=self.scroll_var,
-        ).grid(row=1, column=2, sticky="w", pady=(4, 0))
+        ).grid(row=2, column=2, sticky="w", pady=(4, 0))
 
         keyboard_box = ttk.LabelFrame(main, text="Keyboard", padding=10)
         keyboard_box.pack(fill="x", pady=(0, 12))
@@ -141,7 +151,7 @@ class InputTester:
             ],
         ]
 
-        for row_index, row in enumerate(keyboard_rows):
+        for row in keyboard_rows:
             row_frame = tk.Frame(keyboard_box)
             row_frame.pack(fill="x", pady=3)
 
@@ -168,7 +178,11 @@ class InputTester:
                 widget.pack(side="left", padx=2)
                 self.key_widgets[keysym] = widget
 
-        touchpad_box = ttk.LabelFrame(main, text="Touchpad / Mouse", padding=10)
+        touchpad_box = ttk.LabelFrame(
+            main,
+            text="Touchpad / Mouse",
+            padding=10,
+        )
         touchpad_box.pack(fill="both", expand=True)
 
         self.canvas = tk.Canvas(
@@ -191,11 +205,13 @@ class InputTester:
             ),
             fill="white",
             font=("Sans", 13),
-            tags="instructions",
         )
 
         self.pointer_marker = self.canvas.create_oval(
-            -20, -20, -10, -10,
+            -20,
+            -20,
+            -10,
+            -10,
             fill="#ffffff",
             outline="",
         )
@@ -233,14 +249,21 @@ class InputTester:
     def key_press(self, event):
         self.keys_pressed += 1
 
-        display = event.keysym
+        keysym = event.keysym or "Unknown"
+
+        display = keysym
         if event.char and event.char.isprintable() and not event.char.isspace():
-            display = f"{event.keysym} ({event.char})"
+            display = f"{keysym} ({event.char})"
 
         self.last_key_var.set(f"Last key: {display}")
+        self.raw_key_var.set(
+            f"Raw event: keysym={keysym}   "
+            f"keycode={event.keycode}   "
+            f"state=0x{event.state:x}"
+        )
         self.key_count_var.set(f"Key presses: {self.keys_pressed}")
 
-        widget = self.key_widgets.get(event.keysym)
+        widget = self.key_widgets.get(keysym)
         if widget:
             widget.configure(bg=self.active_key_bg)
 
@@ -301,6 +324,7 @@ class InputTester:
         self.scroll_events = 0
 
         self.last_key_var.set("Last key: None")
+        self.raw_key_var.set("Raw event: None")
         self.key_count_var.set("Key presses: 0")
         self.pointer_var.set("Pointer movement: waiting")
         self.click_var.set("Clicks: L 0   M 0   R 0")
@@ -311,7 +335,10 @@ class InputTester:
 
         self.canvas.coords(
             self.pointer_marker,
-            -20, -20, -10, -10,
+            -20,
+            -20,
+            -10,
+            -10,
         )
 
 

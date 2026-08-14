@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -u
+
+# Wait briefly for NetworkManager to become ready.
+for _ in $(seq 1 15); do
+    if nmcli -t -f STATE general 2>/dev/null | grep -qE 'connected|disconnected|connecting'; then
+        break
+    fi
+    sleep 1
+done
+
+# Ensure Wi-Fi is enabled.
+nmcli radio wifi on >/dev/null 2>&1 || true
+
+# Ask NetworkManager for an immediate AP scan.
+nmcli device wifi rescan >/dev/null 2>&1 || true
