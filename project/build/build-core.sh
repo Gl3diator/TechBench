@@ -68,6 +68,15 @@ cp -a \
     "${WORKSPACE}/config/bootloaders"
 
 
+echo "==> Adding TechBench binary boot artwork"
+
+mkdir -p "${WORKSPACE}/config/includes.binary"
+
+cp -a \
+    "${PROJECT_ROOT}/project/config/core/includes.binary/." \
+    "${WORKSPACE}/config/includes.binary/"
+
+
 INCLUDES="${WORKSPACE}/config/includes.chroot"
 THEME_SOURCE_DIR="${WORKSPACE}/theme-sources"
 APP_SOURCE_DIR="${WORKSPACE}/app-sources"
