@@ -38,3 +38,15 @@ blueman
 
 # Wireless radio block-state diagnostics
 rfkill
+
+# Wi-Fi authentication/backend used by NetworkManager
+wpasupplicant
+
+# Wireless regulatory database
+wireless-regdb
+
+# Wireless inspection utilities
+iw
+
+# PCI hardware identification
+pciutils
