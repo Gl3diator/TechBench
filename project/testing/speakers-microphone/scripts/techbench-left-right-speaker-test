@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+TITLE="Left / Right Speaker Test"
+
+LEFT="/usr/share/sounds/alsa/Front_Left.wav"
+RIGHT="/usr/share/sounds/alsa/Front_Right.wav"
+
+if ! command -v aplay >/dev/null 2>&1; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The audio playback utility is unavailable."
+    exit 1
+fi
+
+if [[ ! -f "${LEFT}" || ! -f "${RIGHT}" ]]; then
+    zenity \
+        --error \
+        --title="${TITLE}" \
+        --text="The Debian speaker test sounds are unavailable."
+    exit 1
+fi
+
+if ! zenity \
+    --question \
+    --title="${TITLE}" \
+    --width=520 \
+    --ok-label="Start Test" \
+    --cancel-label="Cancel" \
+    --text="This test will play:
+
+1. LEFT speaker
+2. RIGHT speaker
+
+Listen and confirm that the sound comes from the correct side."; then
+    exit 0
+fi
+
+zenity \
+    --info \
+    --title="${TITLE}" \
+    --timeout=2 \
+    --text="LEFT speaker"
+
+aplay -q "${LEFT}"
+
+sleep 1
+
+zenity \
+    --info \
+    --title="${TITLE}" \
+    --timeout=2 \
+    --text="RIGHT speaker"
+
+aplay -q "${RIGHT}"
+
+zenity \
+    --info \
+    --title="${TITLE}" \
+    --text="Speaker test complete.
+
+If both announcements came from the correct side, stereo output is working."
