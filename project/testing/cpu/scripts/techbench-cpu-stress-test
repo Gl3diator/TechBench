@@ -1,107 +1,390 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 
-set -euo pipefail
+import os
+import signal
+import subprocess
+import threading
+import time
+import tkinter as tk
+from tkinter import messagebox, ttk
 
-TITLE="CPU Stress Test"
+import psutil
 
-if ! command -v stress-ng >/dev/null 2>&1; then
-    zenity \
-        --error \
-        --title="${TITLE}" \
-        --text="The CPU stress-testing backend is unavailable."
-    exit 1
-fi
 
-DURATION="$(
-    zenity \
-        --list \
-        --radiolist \
-        --title="${TITLE}" \
-        --text="Choose how long to stress the CPU." \
-        --column="Select" \
-        --column="Duration" \
-        TRUE "5 minutes" \
-        FALSE "1 minute" \
-        FALSE "10 minutes" \
-        --width=420 \
-        --height=300
-)" || exit 0
+class CPUStressTest:
+    DURATIONS = {
+        "1 minute": 60,
+        "5 minutes": 300,
+        "10 minutes": 600,
+    }
 
-case "${DURATION}" in
-    "1 minute")
-        TIMEOUT="60s"
-        ;;
-    "5 minutes")
-        TIMEOUT="300s"
-        ;;
-    "10 minutes")
-        TIMEOUT="600s"
-        ;;
-    *)
-        exit 0
-        ;;
-esac
+    def __init__(self, root):
+        self.root = root
+        self.root.title("TechBench - CPU Stress Test")
+        self.root.minsize(720, 520)
 
-if ! zenity \
-    --question \
-    --title="${TITLE}" \
-    --ok-label="Start Test" \
-    --cancel-label="Cancel" \
-    --width=520 \
-    --text="This test will place a heavy load on all available CPU cores for ${DURATION}.
+        self.process = None
+        self.running = False
+        self.start_time = None
+        self.duration_seconds = 300
+        self.max_temp = None
+        self.output_lines = []
 
-Keep Temperatures & Fans open while testing.
+        self.duration_var = tk.StringVar(value="5 minutes")
+        self.status_var = tk.StringVar(value="READY")
+        self.elapsed_var = tk.StringVar(value="00:00 / 05:00")
+        self.load_var = tk.StringVar(value="0%")
+        self.temp_var = tk.StringVar(value="Unavailable")
+        self.max_temp_var = tk.StringVar(value="Unavailable")
 
-Stop the test if temperatures become excessive, the machine becomes unstable, or cooling behaves abnormally."; then
-    exit 0
-fi
+        self.build_ui()
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
 
-LOG="$(mktemp)"
-trap 'rm -f "${LOG}"' EXIT
+        # Prime psutil CPU sampling.
+        psutil.cpu_percent(interval=None)
 
-set +e
+        self.root.after(1000, self.update_live_stats)
 
-stress-ng \
-    --cpu 0 \
-    --verify \
-    --tz \
-    --timeout "${TIMEOUT}" \
-    --metrics-brief \
-    > "${LOG}" 2>&1
+    def build_ui(self):
+        main = ttk.Frame(self.root, padding=18)
+        main.pack(fill="both", expand=True)
 
-STATUS=$?
+        ttk.Label(
+            main,
+            text="CPU Stress Test",
+            font=("Sans", 22, "bold"),
+        ).pack(anchor="w")
 
-set -e
+        ttk.Label(
+            main,
+            text=(
+                "Loads all available CPU cores using stress-ng. "
+                "CPU usage and temperatures update live while the test is running."
+            ),
+            wraplength=680,
+            justify="left",
+        ).pack(anchor="w", pady=(4, 16))
 
-if [[ "${STATUS}" -eq 0 ]]; then
-    {
-        echo "RESULT: TEST COMPLETED"
-        echo
-        echo "No stress-ng verification failure was reported."
-        echo
-        echo "This does not by itself guarantee that the CPU or cooling system is perfect."
-        echo
-        echo "Detailed output"
-        echo "---------------"
-        cat "${LOG}"
-    } > "${LOG}.result"
-else
-    {
-        echo "RESULT: TEST DID NOT COMPLETE SUCCESSFULLY"
-        echo
-        echo "Exit status: ${STATUS}"
-        echo
-        echo "Review the output below and check temperatures/system stability."
-        echo
-        cat "${LOG}"
-    } > "${LOG}.result"
-fi
+        controls = ttk.Frame(main)
+        controls.pack(fill="x", pady=(0, 18))
 
-zenity \
-    --text-info \
-    --title="${TITLE}" \
-    --filename="${LOG}.result" \
-    --width=720 \
-    --height=560
+        ttk.Label(controls, text="Duration:").pack(side="left")
 
-rm -f "${LOG}.result"
+        self.duration_combo = ttk.Combobox(
+            controls,
+            textvariable=self.duration_var,
+            values=list(self.DURATIONS.keys()),
+            state="readonly",
+            width=14,
+        )
+        self.duration_combo.pack(side="left", padx=(8, 18))
+
+        self.start_button = ttk.Button(
+            controls,
+            text="Start Test",
+            command=self.start_test,
+        )
+        self.start_button.pack(side="left")
+
+        self.stop_button = ttk.Button(
+            controls,
+            text="STOP TEST",
+            command=self.stop_test,
+            state="disabled",
+        )
+        self.stop_button.pack(side="left", padx=(12, 0))
+
+        stats = ttk.LabelFrame(main, text="Live Status", padding=14)
+        stats.pack(fill="x")
+
+        self.add_stat_row(stats, 0, "Status", self.status_var)
+        self.add_stat_row(stats, 1, "Elapsed", self.elapsed_var)
+        self.add_stat_row(stats, 2, "CPU Load", self.load_var)
+        self.add_stat_row(stats, 3, "CPU Temperature", self.temp_var)
+        self.add_stat_row(stats, 4, "Maximum Temperature", self.max_temp_var)
+
+        ttk.Label(
+            main,
+            text=(
+                "Stop the test if the machine becomes unstable, "
+                "cooling behaves abnormally, or temperatures become excessive."
+            ),
+            wraplength=680,
+            justify="left",
+        ).pack(anchor="w", pady=(16, 10))
+
+        output_box = ttk.LabelFrame(main, text="stress-ng Output", padding=8)
+        output_box.pack(fill="both", expand=True)
+
+        self.output = tk.Text(
+            output_box,
+            height=10,
+            wrap="word",
+            state="disabled",
+        )
+        self.output.pack(fill="both", expand=True)
+
+    def add_stat_row(self, parent, row, label, variable):
+        ttk.Label(
+            parent,
+            text=f"{label}:",
+            font=("Sans", 11, "bold"),
+        ).grid(row=row, column=0, sticky="w", padx=(0, 20), pady=4)
+
+        ttk.Label(
+            parent,
+            textvariable=variable,
+            font=("Sans", 11),
+        ).grid(row=row, column=1, sticky="w", pady=4)
+
+    def append_output(self, text):
+        self.output.configure(state="normal")
+        self.output.insert("end", text)
+        self.output.see("end")
+        self.output.configure(state="disabled")
+
+    def read_cpu_temperature(self):
+        candidates = []
+
+        try:
+            temps = psutil.sensors_temperatures(fahrenheit=False)
+        except Exception:
+            temps = {}
+
+        for group_name, entries in temps.items():
+            group_lower = group_name.lower()
+
+            for entry in entries:
+                if entry.current is None:
+                    continue
+
+                label = (entry.label or "").lower()
+
+                score = 0
+
+                if "coretemp" in group_lower:
+                    score += 100
+                if "k10temp" in group_lower:
+                    score += 100
+                if "zenpower" in group_lower:
+                    score += 100
+
+                if "package" in label:
+                    score += 80
+                if "tctl" in label:
+                    score += 80
+                if "tdie" in label:
+                    score += 80
+                if "cpu" in label:
+                    score += 60
+
+                candidates.append((score, float(entry.current)))
+
+        if not candidates:
+            return None
+
+        candidates.sort(reverse=True)
+        return candidates[0][1]
+
+    def start_test(self):
+        if self.running:
+            return
+
+        duration_name = self.duration_var.get()
+        self.duration_seconds = self.DURATIONS.get(duration_name, 300)
+
+        if not messagebox.askyesno(
+            "CPU Stress Test",
+            (
+                f"This will place a heavy load on all CPU cores for "
+                f"{duration_name}.\n\n"
+                "Live CPU load and temperature will be shown during the test.\n\n"
+                "You can stop it at any time with the STOP TEST button.\n\n"
+                "Start the test?"
+            ),
+        ):
+            return
+
+        self.output.configure(state="normal")
+        self.output.delete("1.0", "end")
+        self.output.configure(state="disabled")
+
+        self.max_temp = None
+        self.max_temp_var.set("Unavailable")
+        self.start_time = time.monotonic()
+        self.running = True
+
+        self.status_var.set("RUNNING")
+        self.start_button.configure(state="disabled")
+        self.stop_button.configure(state="normal")
+        self.duration_combo.configure(state="disabled")
+
+        command = [
+            "stress-ng",
+            "--cpu",
+            "0",
+            "--verify",
+            "--tz",
+            "--timeout",
+            f"{self.duration_seconds}s",
+            "--metrics-brief",
+        ]
+
+        try:
+            self.process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1,
+                start_new_session=True,
+            )
+        except Exception as exc:
+            self.running = False
+            self.status_var.set("FAILED TO START")
+            self.start_button.configure(state="normal")
+            self.stop_button.configure(state="disabled")
+            self.duration_combo.configure(state="readonly")
+            messagebox.showerror(
+                "CPU Stress Test",
+                f"Could not start stress-ng:\n\n{exc}",
+            )
+            return
+
+        threading.Thread(
+            target=self.read_process_output,
+            daemon=True,
+        ).start()
+
+        threading.Thread(
+            target=self.wait_for_process,
+            daemon=True,
+        ).start()
+
+    def read_process_output(self):
+        if not self.process or not self.process.stdout:
+            return
+
+        for line in self.process.stdout:
+            self.root.after(0, self.append_output, line)
+
+    def wait_for_process(self):
+        if not self.process:
+            return
+
+        status = self.process.wait()
+        self.root.after(0, self.process_finished, status)
+
+    def process_finished(self, status):
+        was_running = self.running
+        self.running = False
+
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(state="normal")
+        self.duration_combo.configure(state="readonly")
+
+        if not was_running:
+            self.status_var.set("STOPPED")
+            return
+
+        if status == 0:
+            self.status_var.set("COMPLETED")
+            messagebox.showinfo(
+                "CPU Stress Test",
+                (
+                    "CPU stress test completed.\n\n"
+                    "stress-ng reported no verification failure.\n\n"
+                    f"Maximum observed CPU temperature: "
+                    f"{self.format_temp(self.max_temp)}"
+                ),
+            )
+        else:
+            self.status_var.set(f"ENDED (exit {status})")
+            messagebox.showwarning(
+                "CPU Stress Test",
+                (
+                    "The stress test did not complete normally.\n\n"
+                    f"stress-ng exit status: {status}\n\n"
+                    f"Maximum observed CPU temperature: "
+                    f"{self.format_temp(self.max_temp)}"
+                ),
+            )
+
+    def stop_test(self):
+        if not self.running or not self.process:
+            return
+
+        self.status_var.set("STOPPING...")
+        self.stop_button.configure(state="disabled")
+
+        try:
+            os.killpg(
+                os.getpgid(self.process.pid),
+                signal.SIGTERM,
+            )
+        except ProcessLookupError:
+            pass
+        except Exception as exc:
+            messagebox.showerror(
+                "CPU Stress Test",
+                f"Could not stop stress-ng:\n\n{exc}",
+            )
+            return
+
+        self.running = False
+        self.status_var.set("STOPPED")
+
+    def format_temp(self, value):
+        if value is None:
+            return "Unavailable"
+        return f"{value:.1f} °C"
+
+    def update_live_stats(self):
+        load = psutil.cpu_percent(interval=None)
+        self.load_var.set(f"{load:.0f}%")
+
+        temp = self.read_cpu_temperature()
+
+        if temp is None:
+            self.temp_var.set("Unavailable")
+        else:
+            self.temp_var.set(f"{temp:.1f} °C")
+
+            if self.max_temp is None or temp > self.max_temp:
+                self.max_temp = temp
+                self.max_temp_var.set(f"{self.max_temp:.1f} °C")
+
+        if self.running and self.start_time is not None:
+            elapsed = int(time.monotonic() - self.start_time)
+            remaining_total = self.duration_seconds
+
+            elapsed_display = min(elapsed, remaining_total)
+
+            self.elapsed_var.set(
+                f"{elapsed_display // 60:02d}:{elapsed_display % 60:02d} / "
+                f"{remaining_total // 60:02d}:{remaining_total % 60:02d}"
+            )
+
+        self.root.after(1000, self.update_live_stats)
+
+    def on_close(self):
+        if self.running:
+            if not messagebox.askyesno(
+                "CPU Stress Test",
+                "The CPU stress test is still running.\n\nStop it and exit?",
+            ):
+                return
+
+            self.stop_test()
+
+        self.root.destroy()
+
+
+def main():
+    root = tk.Tk()
+    CPUStressTest(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

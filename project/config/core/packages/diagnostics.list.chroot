@@ -79,3 +79,6 @@ udisks2
 
 # Storage enumeration helpers used by TechBench wrappers
 util-linux
+
+# Live CPU utilization for TechBench stress-test GUI
+python3-psutil
