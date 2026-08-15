@@ -34,6 +34,7 @@ configure_live_build() {
             --distribution "${DISTRIBUTION}" \
             --architectures "${ARCHITECTURE}" \
             --binary-images iso-hybrid \
+            --iso-volume "TechBench" \
             --archive-areas "main non-free-firmware" \
             --memtest memtest86+ \
             --apt-recommends false

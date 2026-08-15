@@ -1,0 +1,12 @@
+label live-@FLAVOUR@
+    menu label ^Start TechBench
+    menu default
+    linux @LINUX@
+    initrd @INITRD@
+    append @APPEND_LIVE@
+
+label live-@FLAVOUR@-failsafe
+    menu label TechBench ^Safe Graphics Mode
+    linux @LINUX@
+    initrd @INITRD@
+    append @APPEND_LIVE_FAILSAFE@

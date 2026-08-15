@@ -59,6 +59,15 @@ WORKSPACE="$(prepare_workspace core)"
 
 configure_live_build "${WORKSPACE}"
 
+echo "==> Adding TechBench bootloader branding"
+
+rm -rf "${WORKSPACE}/config/bootloaders"
+
+cp -a \
+    "${PROJECT_ROOT}/project/config/core/bootloaders" \
+    "${WORKSPACE}/config/bootloaders"
+
+
 INCLUDES="${WORKSPACE}/config/includes.chroot"
 THEME_SOURCE_DIR="${WORKSPACE}/theme-sources"
 APP_SOURCE_DIR="${WORKSPACE}/app-sources"
