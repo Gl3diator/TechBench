@@ -14,44 +14,46 @@
 </p>
 
 <p align="center">
-  <img alt="Status" src="https://img.shields.io/badge/status-early%20development-orange">
-  <img alt="Architecture" src="https://img.shields.io/badge/architecture-x86--64-blue">
-  <img alt="Base" src="https://img.shields.io/badge/base-Debian%20Stable-red">
-  <img alt="Desktop" src="https://img.shields.io/badge/desktop-XFCE-2284F2">
-  
+  <img alt="Release" src="https://img.shields.io/badge/release-v1.0.0-brightgreen">
+  <img alt="Edition" src="https://img.shields.io/badge/edition-TechBench%20Check-0A84FF">
+  <img alt="base" src="https://img.shields.io/badge/base-Debian%2013%20Trixie-A81D33?logo=debian&logoColor=white">
+  <img alt="Desktop" src="https://img.shields.io/badge/desktop-XFCE-2284F2?logo=xfce&logoColor=white">
+  <img alt="Architecture" src="https://img.shields.io/badge/architecture-x86--64%20%2F%20amd64-4C8BF5">
+  <img alt="Boot" src="https://img.shields.io/badge/boot-UEFI%20%2B%20Legacy%20BIOS-6C63FF">
+ 
+---
+# TechBench Linux
+
+TechBench Linux is a bootable Linux Live USB toolkit for PC diagnostics, hardware testing, repair, refurbishment, and used-PC inspection.
+
+The current public edition is **TechBench Check**.
+
+### TechBench Check v1.0.0
+
+Download the latest release from GitHub Releases:
+
+<p align="center">
+  <h1 align="center">
+    <a href="https://github.com/Gl3diator/TechBench/releases/tag/v1.0.0">
+      Download TechBench Check v1.0.0
+    </a>
+  </h1>
 </p>
 
----
+
 
 ## What is TechBench?
 
-**TechBench Linux** is a portable Linux environment designed to boot directly
-from USB without installing anything on the target computer.
+TechBench is designed primarily for:
 
-It is intended primarily for:
+1. PC and laptop repair technicians and refurbishers.
+2. People inspecting used PCs and laptops before purchasing them.
 
-- PC and laptop repair technicians
-- Computer refurbishers
-- People inspecting used PCs and laptops before buying them
+It runs directly from USB without installation and is designed to keep core diagnostic functionality available offline.
 
-TechBench follows the toolbox philosophy of projects such as Hiren's BootCD PE,
-but uses Linux-native and primarily open-source utilities.
+TechBench is not intended to be a general-purpose desktop Linux distribution.
 
-The goal is not to create another general-purpose Linux distribution.
 
-The goal is to create a **portable technician appliance**:
-
-```text
-Insert USB
-    ↓
-Boot TechBench
-    ↓
-Diagnose / Test / Repair / Recover
-    ↓
-Shut down
-    ↓
-Remove USB
-```
 
 ---
 
@@ -78,122 +80,90 @@ profiles.
 ```text
                     TechBench Core
                           │
-             ┌────────────┴────────────┐
-             │                         │
-      TechBench Check           TechBench Pro
-       Used-PC profile        Technician profile
+             ┌────────────┴────────────────┐
+             │                             │
+      TechBench Check               TechBench Pro
+       Used-PC profile            Technician profile
+  (TechBench Check v1.0.0)          (coming soon)
 ```
 
 Both editions will be produced from the same repository.
 
-### TechBench Check
+# TechBench Check
 
-Designed primarily for inspecting used PCs and laptops.
+TechBench Check focuses on hardware diagnostics and used-PC inspection.
 
-The focus is on **safe, simple, graphical diagnostics**.
+Included capabilities include:
 
-Planned capabilities include:
-
-- CPU identification
-- GPU identification
-- RAM information
-- Motherboard and system information
-- HDD / SSD / NVMe identification
-- SMART data
-- NVMe health and wear information
-- Battery condition
-- Temperatures and sensors
+- CPU and system hardware information
+- GPU identification and information
 - CPU stress testing
 - GPU stress testing
 - Memory testing
+- Bootable memory diagnostics
+- HDD, SSD, and NVMe information
+- SMART drive health diagnostics
+- Storage performance testing
+- Temperature and hardware sensor monitoring
+- Battery information and health checks
 - Display testing
-- Keyboard testing
+- Keyboard and touchpad testing
 - Webcam testing
-- Speaker and microphone testing
-- Wi-Fi
-- Bluetooth
-- USB and PCI device inspection
+- Audio and microphone testing
+- Ethernet and Wi-Fi testing
+- Bluetooth support
+- USB and connected-device inspection
 
-TechBench Check should contain few or no destructive utilities.
+## Platform
 
-### TechBench Pro
+- Debian 13 (Trixie)
+- XFCE
+- x86-64 / amd64
+- UEFI and Legacy BIOS
+- Bootable Live ISO
+- Offline-first core functionality
 
-Designed for repair technicians and refurbishers.
+## Build TechBench Yourself
 
-It includes the Check functionality plus tools for:
+TechBench is currently built and tested on **Debian 13 (Trixie) x86-64**.
 
-- Partition management
-- Filesystem repair
-- Data recovery
-- Damaged-drive recovery
-- Disk cloning
-- Disk imaging
-- Disk wiping
-- Network troubleshooting
-- File transfer
-- USB / ISO preparation
-- Archive and file utilities
-- Advanced storage tools
-- Terminal-based technician utilities
+A clean Debian 13 installation or virtual machine is recommended.
 
----
+### Build environment
 
-## Hardware goals
+- Debian 13 (Trixie)
+- x86-64 / amd64
+- Sufficient free disk space for the live-build workspace and resulting ISO
+- `sudo` access
 
-TechBench targets approximately **Windows 7-era x86-64 hardware through modern systems**.
+### Clone the repository
 
-Priority hardware includes:
+```bash
+git clone https://github.com/Gl3diator/TechBench.git
+cd TechBench
+```
 
-- Intel CPUs
-- AMD CPUs
-- Intel graphics
-- AMD graphics
-- NVIDIA graphics
-- SATA HDDs
-- SATA SSDs
-- NVMe SSDs
-- USB storage
-- Ethernet adapters
-- Wi-Fi adapters
-- Bluetooth adapters
-- Laptop batteries
-- Common hardware sensors
+### Build TechBench
 
-A device that Linux cannot operate must be reported as **unsupported or unavailable**, not incorrectly labelled as failed hardware.
+Run:
 
----
+```bash
+./project/build/build-core.sh 2>&1 | tee ~/techbench-core-build.log
+```
 
-## V1 target
+The build process uses Debian `live-build` to create the TechBench Live ISO.
 
-The first major milestone is intentionally smaller than the eventual
-technician-toolbox vision.
+When the build completes successfully, the ISO will be available at:
 
-### V1 foundation
+```text
+out/
+```
 
-- [ ] Debian Live environment
-- [ ] XFCE desktop
-- [ ] UEFI boot
-- [ ] Legacy BIOS boot where practical
-- [ ] Networking
-- [ ] Broad firmware support
-- [ ] Thunar file manager
-- [ ] CPU identification
-- [ ] GPU identification
-- [ ] Temperature / sensor monitoring
-- [ ] SMART diagnostics
-- [ ] NVMe diagnostics
-- [ ] CPU stress testing
-- [ ] GPU stress testing
-- [ ] Memtest86+ boot entry
-- [ ] GParted
-- [ ] TestDisk
-- [ ] PhotoRec
-- [ ] Physical hardware validation
+### Verify the build
 
-Once that foundation is reliable, additional recovery, cloning,
-refurbishment and usability features can be added incrementally.
-
----
+```bash
+sha256sum out/TechBench-Core-amd64.iso
+```
 
 ## Repository layout
 
@@ -239,74 +209,39 @@ TechBench/
 
 ---
 
-## Documentation
+## TechBench Pro
 
-Project documentation lives in [`res/doc/`](res/doc/).
+**TechBench Pro** is planned as the expanded technician edition.
 
-- [Architecture](res/doc/architecture.md)
-- [Hardware compatibility](res/doc/compatibility.md)
-- [Testing strategy](res/doc/testing.md)
-- [Tool selection](res/doc/tools.md)
+It will include everything in TechBench Check plus additional tools for:
 
----
+- Partition management
+- Data recovery
+- Disk imaging
+- Disk cloning
+- Filesystem repair
+- Damaged-drive recovery
+- Disk wiping
+- Network diagnostics
+- USB / ISO tools
+- Advanced technician utilities
 
-## Planned build outputs
+TechBench Check and TechBench Pro are generated from the same shared TechBench Core.
 
-Eventually the repository will produce:
+## Contributing and Security
 
-```text
-TechBench-Check-x86_64.iso
-TechBench-Pro-x86_64.iso
-```
+See:
 
-Both will inherit the same TechBench Core configuration.
+- `CONTRIBUTING.md`
+- `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
 
-The build system is **not yet complete**, and there are currently no official
-TechBench ISO releases.
-
----
-
-## Contributing
-
-TechBench is currently in early development.
-
-Contributions, hardware testing, compatibility reports and tool suggestions are
-welcome.
-
-Before contributing, please read:
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-
-When proposing a new bundled application, consider:
-
-1. What technician problem does it solve?
-2. Is it actively maintained?
-3. Is it available for Debian?
-4. Does another included utility already provide the same functionality?
-5. Does it improve hardware coverage or usability?
-6. Can it legally be redistributed?
-
----
-
-## Security
-
-Please do not report security vulnerabilities through public GitHub issues.
-
-See [SECURITY.md](SECURITY.md) for the project's security reporting policy.
-
----
-
-## Project status
-
+## Status
 > [!IMPORTANT]
-> TechBench is currently in **early development**.
+> **TechBench Check v1.0.0 is released.**
 
+> TechBench Pro is currently  **under development**.
 
-There are no stable releases yet.
-
-The immediate objective is to produce and validate a basic Debian + XFCE Live
-ISO before expanding the project into its full technician toolbox.
 
 ---
 
